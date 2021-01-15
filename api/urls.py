@@ -4,12 +4,12 @@ from .views import CategoryViewSet, CurrentCategoryViewSet, TitleViewSet, Curren
 
 
 router = DefaultRouter()
-router.register('categories', CategoryViewSet)
-router.register('categories/{slug}', CurrentCategoryViewSet)
-router.register('titles', TitleViewSet)
-router.register('titles/{titles_id}', CurrentTitleViewSet)
-router.register('genres', GenreViewSet)
-router.register('genres/{slug}', CurrentGenreViewSet)
+router.register('api/v1/categories', CategoryViewSet)
+router.register('api/v1/categories/{slug}', CurrentCategoryViewSet)
+router.register('api/v1/titles', TitleViewSet)
+router.register('api/v1/titles/{titles_id}', CurrentTitleViewSet)
+router.register('api/v1/genres', GenreViewSet)
+router.register('api/v1/genres/{slug}', CurrentGenreViewSet)
 
 
 urlpatterns = [
