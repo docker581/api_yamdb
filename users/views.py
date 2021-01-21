@@ -15,7 +15,7 @@ class EmailAPIView(APIView):
         email = request.data.get('email')
         username = email.split('@')[0]
         user, created = User.objects.get_or_create(
-            username=username, 
+            username=username,
             email=email, 
             is_active=False,
         )
