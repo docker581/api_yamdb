@@ -8,7 +8,12 @@ class Category(models.Model):
 class Title(models.Model):
     name = models.CharField(max_length=50)
     year = models.PositiveSmallIntegerField()
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL)
+    category = models.ForeignKey(
+        Category, 
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
 
 class Genre(models.Model):
     name = models.CharField(max_length=50)
