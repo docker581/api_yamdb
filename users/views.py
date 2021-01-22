@@ -7,7 +7,7 @@ from rest_framework.permissions import (
 )
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet, ViewSet, GenericViewSet
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.decorators import permission_classes
 from rest_framework.mixins import (
     CreateModelMixin, 
@@ -67,6 +67,29 @@ class UserViewSet(CreateModelMixin, ListModelMixin, GenericViewSet):
         username = self.request.query_params.get('username', None)
         serializer.save(email=email, username=username)
 
+
+@permission_classes([IsAuthenticated, IsAdmin])
+class UserModelViewSet(ModelViewSet):
+    serializer_class = UserSerializer
+    pagination_class = PageNumberPagination
+    lookup_field = 'username'
+
+    def get_queryset(self):
+        queryset = User.objects.all()
+        username = self.request.query_params.get('search', None)
+        if username is not None:
+            user_id = User.objects.get(username=username).id
+            queryset = queryset.filter(user=user_id)
+        return queryset    
+
+    # def perform_create(self, serializer):
+    #     email = self.request.query_params.get('email', None)
+    #     serializer.save(email=email)
+
+    def retrieve(self, pk, username):
+        user = User.objects.get(username=username)
+        serializer = self.get_serializer(user)
+        return Response(serializer.data)
 
 
 @permission_classes([IsAuthenticated])
