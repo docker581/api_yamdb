@@ -16,7 +16,7 @@ from .permissions import IsSuperuserPermissionOrReadOnly
 class CategoryViewSet(ListModelMixin, CreateModelMixin, DestroyModelMixin, viewsets.GenericViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [IsSuperuserPermissionOrReadOnly & IsAuthenticatedOrReadOnly] 
+    permission_classes = [IsSuperuserPermissionOrReadOnly] 
     pagination_class = PageNumberPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ['name',]
