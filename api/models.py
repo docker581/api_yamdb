@@ -7,6 +7,12 @@ class Category(models.Model):
     name = models.CharField(max_length=50)
     slug = models.SlugField(max_length=50, unique=True)
 
+
+class Genre(models.Model):
+    name = models.CharField(max_length=50)
+    slug = models.SlugField(max_length=50, unique=True)
+
+
 class Title(models.Model):
     name = models.CharField(max_length=50)
     year = models.PositiveSmallIntegerField()
@@ -16,10 +22,9 @@ class Title(models.Model):
         blank=True,
         null=True,
     )
+    genre = models.ManyToManyField(Genre)
+    description = models.TextField(default='')
 
-class Genre(models.Model):
-    name = models.CharField(max_length=50)
-    slug = models.SlugField(max_length=50, unique=True)
 
 class GenreTitle(models.Model):
     title_id = models.ForeignKey(Title, on_delete=models.CASCADE)
