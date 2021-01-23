@@ -10,44 +10,37 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib import auth
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from .models import Category, Title, Genre, GenreTitle
-from .serializers import CategorySerializer, TitleSerializer, GenreSerializer
+from .models import Category, Title, Genre, GenreTitle, Comment, Review
+from .serializers import CategorySerializer, TitleSerializer, GenreSerializer, CommentSerializer, ReviewSerializer
 from .permissions import IsSuperuserPermissionOrReadOnly
 
 User = get_user_model()
 
-from .models import (
-    Comment,
-    Review,
-    Title
-)
-from .serializers import (
-    CommentSerializer,
-    ReviewSerializer
-)
 
 class CategoryViewSet(ListModelMixin, CreateModelMixin, DestroyModelMixin, viewsets.GenericViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [IsSuperuserPermissionOrReadOnly & IsAuthenticatedOrReadOnly] 
+    permission_classes = [IsSuperuserPermissionOrReadOnly]
     pagination_class = PageNumberPagination
     filter_backends = [filters.SearchFilter]
-    search_fields = ['name',]
+    search_fields = ['name', ]
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
+    permission_classes = [IsSuperuserPermissionOrReadOnly]
+    pagination_class = PageNumberPagination
 
 
-class GenreViewSet(viewsets.ModelViewSet):    
+class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = [IsSuperuserPermissionOrReadOnly] 
+    permission_classes = [IsSuperuserPermissionOrReadOnly]
     filter_backends = [filters.SearchFilter]
-    search_fields = ['name',]
-    
-    
+    search_fields = ['name', ]
+
+
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
 
@@ -59,7 +52,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         )
 
         return review.comments.all()
-    
+
     def perform_create(self, serializer):
         get_object_or_404(
             Review,
@@ -69,7 +62,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
         serializer.save(author=self.request.user)
 
-        
+
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
 
@@ -80,7 +73,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         )
 
         return title.reviews.all()
-    
+
     def perform_create(self, serializer):
         title = get_object_or_404(
             Title,
@@ -90,7 +83,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         if Review.objects.filter(
             author=self.request.user,
             title_id=title.id
-            ).exists():
+        ).exists():
 
             serializer.save(
                 author=self.request.user,
@@ -99,4 +92,3 @@ class ReviewViewSet(viewsets.ModelViewSet):
         raise serializers.ValidationError(
                 {'errors': 'you already reviewed'}
             )
-  

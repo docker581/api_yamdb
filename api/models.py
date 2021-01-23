@@ -3,6 +3,7 @@ from django.db import models
 
 User = get_user_model()
 
+
 class Category(models.Model):
     name = models.CharField(max_length=50)
     slug = models.SlugField(max_length=50, unique=True)
@@ -17,13 +18,14 @@ class Title(models.Model):
     name = models.CharField(max_length=50)
     year = models.PositiveSmallIntegerField()
     category = models.ForeignKey(
-        Category, 
+        Category,
         on_delete=models.SET_NULL,
         blank=True,
-        null=True,
+        null=True
     )
     genre = models.ManyToManyField(Genre)
     description = models.TextField(default='')
+    rating = models.FloatField(null=True)
 
 
 class GenreTitle(models.Model):
@@ -33,17 +35,17 @@ class GenreTitle(models.Model):
 
 class Review(models.Model):
     score_choices = {
-        (0,'0'),
-        (1,'1'),
-        (2,'2'),
-        (3,'3'),
-        (4,'4'),
-        (5,'5'),
-        (6,'6'),
-        (7,'7'),
-        (8,'8'),
-        (9,'9'),
-        (10,'10'),
+        (0, '0'),
+        (1, '1'),
+        (2, '2'),
+        (3, '3'),
+        (4, '4'),
+        (5, '5'),
+        (6, '6'),
+        (7, '7'),
+        (8, '8'),
+        (9, '9'),
+        (10, '10'),
     }
 
     title_id = models.ForeignKey(
@@ -67,6 +69,7 @@ class Review(models.Model):
     pub_date = models.DateTimeField(
         auto_now_add=True
     )
+
 
 class Comment(models.Model):
     review_id = models.ForeignKey(
