@@ -1,30 +1,38 @@
-from rest_framework import viewsets
-from rest_framework import status
+from rest_framework import generics, viewsets, status, filters, permissions
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+
 from django.shortcuts import get_object_or_404
 from .models import Category, Title, Genre, GenreTitle
-from .serializers import CategorySerializer, TitleSerializer, GenreSerializer, GenreTitleSerializer
+from .serializers import CategorySerializer, TitleSerializer, GenreSerializer
+from .permissions import IsSuperuserPermissionOrReadOnly
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
-    pass
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsSuperuserPermissionOrReadOnly] 
+    pagination_class = PageNumberPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name',]
 
 
-class CurrentCategoryViewSet(viewsets.ModelViewSet):
-    pass
+    def destroy(self, request, slug):
+        instance = self.get_object(slug=self.kwargs.get('slug'))
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    pass
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
 
 
-class CurrentTitleViewSet(viewsets.ModelViewSet):
-    pass
-
-
-class GenreViewSet(viewsets.ModelViewSet):
-    pass
-
-
-class CurrentGenreViewSet(viewsets.ModelViewSet):
-    pass
+class GenreViewSet(viewsets.ModelViewSet):    
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    permission_classes = [IsSuperuserPermissionOrReadOnly] 
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name',]
+    
