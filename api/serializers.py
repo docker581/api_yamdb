@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.fields import MISSING_ERROR_MESSAGE
 from rest_framework.validators import UniqueTogetherValidator
 from .models import (
     Category, 
@@ -16,6 +17,15 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
+    genre = serializers.SlugRelatedField(
+        queryset = Genre.objects.all(),
+        slug_field = 'slug',
+        many = True
+    )
+    category = serializers.SlugRelatedField(
+        queryset = Category.objects.all(),
+        slug_field = 'slug'
+    )
     class Meta:
          fields = ('__all__')
          model = Title
