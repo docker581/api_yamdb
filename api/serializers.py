@@ -15,7 +15,23 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
 
 
+class GenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ('name', 'slug')
+        model = Genre
+
+
 class TitleSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+    genre = GenreSerializer(read_only=True, many=True)
+    rating = serializers.FloatField(read_only=True)
+
+    class Meta:
+        fields = ('__all__')
+        model = Title
+
+
+class Title2Serializer(serializers.ModelSerializer):
     genre = serializers.SlugRelatedField(
         queryset=Genre.objects.all(),
         slug_field='slug',
@@ -29,12 +45,6 @@ class TitleSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('__all__')
         model = Title
-
-
-class GenreSerializer(serializers.ModelSerializer):
-    class Meta:
-        fields = ('name', 'slug')
-        model = Genre
 
 
 class CommentSerializer(serializers.ModelSerializer):

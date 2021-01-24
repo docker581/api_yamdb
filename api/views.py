@@ -11,7 +11,7 @@ from django.contrib import auth
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from .models import Category, Title, Genre, GenreTitle, Comment, Review
-from .serializers import CategorySerializer, TitleSerializer, GenreSerializer, CommentSerializer, ReviewSerializer
+from .serializers import CategorySerializer, TitleSerializer, GenreSerializer, CommentSerializer, ReviewSerializer, Title2Serializer
 from .permissions import IsSuperuserPermissionOrReadOnly
 
 User = get_user_model()
@@ -24,6 +24,7 @@ class CategoryViewSet(ListModelMixin, CreateModelMixin, DestroyModelMixin, views
     pagination_class = PageNumberPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', ]
+    lookup_field = 'slug'
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -31,14 +32,35 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     permission_classes = [IsSuperuserPermissionOrReadOnly]
     pagination_class = PageNumberPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['genre__slug', 'category__slug', 'year', ]
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return TitleSerializer
+        return Title2Serializer
+
+    def get_queryset(self):
+        queryset = Title.objects.all()
+        category = self.request.query_params.get('category', None)
+        genre = self.request.query_params.get('genre', None)
+        name = self.request.query_params.get('name', None)
+        if category is not None:
+            queryset = queryset.filter(category__slug=category)
+        if genre is not None:
+            queryset = queryset.filter(genre__slug=genre)
+        if name is not None:
+            queryset = queryset.filter(name__icontains=name)
+        return queryset
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(ListModelMixin, CreateModelMixin, DestroyModelMixin, viewsets.GenericViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = [IsSuperuserPermissionOrReadOnly]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', ]
+    lookup_field = 'slug'
 
 
 class CommentViewSet(viewsets.ModelViewSet):
