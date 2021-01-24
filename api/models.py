@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.db.models import fields
 
 User = get_user_model()
 
@@ -25,7 +26,6 @@ class Title(models.Model):
     )
     genre = models.ManyToManyField(Genre)
     description = models.TextField(default='')
-    rating = models.FloatField(null=True)
 
 
 class GenreTitle(models.Model):
@@ -33,24 +33,22 @@ class GenreTitle(models.Model):
     genre_id = models.ForeignKey(Genre, on_delete=models.CASCADE)
 
 
+class IntegerRangeField(models.IntegerField):
+    def __init__(self, verbose_name=None, name=None, min_value=None, max_value=None, **kwargs):
+        self.min_value, self.max_value = min_value, max_value
+        models.IntegerField.__init__(self, verbose_name, name, **kwargs)
+    def formfield(self, **kwargs):
+        defaults = {'min_value': self.min_value, 'max_value':self.max_value}
+        defaults.update(kwargs)
+        return super(IntegerRangeField, self).formfield(**defaults)
+
+
 class Review(models.Model):
-    score_choices = {
-        (0, '0'),
-        (1, '1'),
-        (2, '2'),
-        (3, '3'),
-        (4, '4'),
-        (5, '5'),
-        (6, '6'),
-        (7, '7'),
-        (8, '8'),
-        (9, '9'),
-        (10, '10'),
-    }
 
     title_id = models.ForeignKey(
         Title,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name="reviews"
     )
 
     text = models.TextField()
@@ -61,10 +59,7 @@ class Review(models.Model):
         related_name="reviews"
     )
 
-    score = models.PositiveSmallIntegerField(
-        choices=score_choices,
-        default=0
-    )
+    score = IntegerRangeField(min_value=1, max_value=10)
 
     pub_date = models.DateTimeField(
         auto_now_add=True
