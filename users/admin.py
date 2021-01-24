@@ -4,7 +4,7 @@ from .models import User
 
 
 class UserAdmin(admin.ModelAdmin):
-    list_display=('email', 'role', 'bio', 'last_name', 'first_name')
+    list_display = ('email', 'role', 'bio', 'last_name', 'first_name')
     empty_value_display = '-пусто-'
 
 
