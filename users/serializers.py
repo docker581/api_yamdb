@@ -19,6 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
 class TokenSerializer(serializers.Serializer):
     email = serializers.EmailField()
     confirmation_code = serializers.CharField()
+
     def validate(self, data):
         email = data['email']
         confirmation_code = data['confirmation_code']

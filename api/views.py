@@ -25,7 +25,8 @@ from .permissions import IsSuperuserPermissionOrReadOnly, IsOwnerOrReadOnly
 User = get_user_model()
 
 
-class CategoryViewSet(ListModelMixin, CreateModelMixin, DestroyModelMixin, viewsets.GenericViewSet):
+class CategoryViewSet(ListModelMixin, CreateModelMixin, DestroyModelMixin,
+                      viewsets.GenericViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsSuperuserPermissionOrReadOnly]
@@ -62,7 +63,8 @@ class TitleViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-class GenreViewSet(ListModelMixin, CreateModelMixin, DestroyModelMixin, viewsets.GenericViewSet):
+class GenreViewSet(ListModelMixin, CreateModelMixin, DestroyModelMixin,
+                   viewsets.GenericViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = [IsSuperuserPermissionOrReadOnly]
