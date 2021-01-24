@@ -1,18 +1,25 @@
-from rest_framework import generics, viewsets, status, filters, permissions, viewsets, serializers
-from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, ListModelMixin
-from rest_framework.response import Response
+from rest_framework import filters, viewsets, serializers
+from rest_framework.mixins import (
+    CreateModelMixin,
+    DestroyModelMixin,
+    ListModelMixin
+)
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, DjangoModelPermissionsOrAnonReadOnly
-from rest_framework.generics import get_object_or_404
-from django.utils.text import slugify
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Avg
 
-from django.contrib import auth
+from django.db.models import Avg
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from .models import Category, Title, Genre, GenreTitle, Comment, Review
-from .serializers import CategorySerializer, TitleSerializer, GenreSerializer, CommentSerializer, ReviewSerializer, Title2Serializer
+from .models import Category, Title, Genre, Review
+from .serializers import (
+    CategorySerializer,
+    TitleSerializer,
+    GenreSerializer,
+    CommentSerializer,
+    ReviewSerializer,
+    Title2Serializer
+)
 from .permissions import IsSuperuserPermissionOrReadOnly, IsOwnerOrReadOnly
 
 User = get_user_model()
@@ -42,7 +49,7 @@ class TitleViewSet(viewsets.ModelViewSet):
         return Title2Serializer
 
     def get_queryset(self):
-        queryset = queryset = Title.objects.annotate(rating=Avg('reviews__score'))
+        queryset = Title.objects.annotate(rating=Avg('reviews__score'))
         category = self.request.query_params.get('category', None)
         genre = self.request.query_params.get('genre', None)
         name = self.request.query_params.get('name', None)
@@ -84,7 +91,10 @@ class CommentViewSet(viewsets.ModelViewSet):
             title_id=self.kwargs.get('title_id')
         )
 
-        serializer.save(author=self.request.user, review_id_id=self.kwargs.get('review_id'))
+        serializer.save(
+            author=self.request.user,
+            review_id_id=self.kwargs.get('review_id')
+        )
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
