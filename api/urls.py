@@ -5,7 +5,7 @@ from .views import (
     TitleViewSet,
     GenreViewSet,
     CommentViewSet,
-    ReviewViewSet
+    ReviewViewSet,
 )
 
 
@@ -16,12 +16,12 @@ router.register('genres', GenreViewSet, basename='genres')
 router.register(
     r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
     CommentViewSet,
-    basename='comments'
+    basename='comments',
 )
 router.register(
     r'titles/(?P<title_id>\d+)/reviews',
     ReviewViewSet,
-    basename='review'
+    basename='review',
 )
 
 urlpatterns = [
