@@ -19,6 +19,4 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
                 or request.user.role == 'moderator'
             )
         else:
-            return (
-                request.method in permissions.SAFE_METHODS
-            )
+            return request.method in permissions.SAFE_METHODS

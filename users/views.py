@@ -4,19 +4,11 @@ from django.core.mail import send_mail
 from rest_framework import status
 from rest_framework.decorators import permission_classes, action
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import (
-    IsAuthenticated,
-    IsAuthenticatedOrReadOnly,
-)
+from rest_framework.permissions import (IsAuthenticated,)
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet, GenericViewSet
-from rest_framework.mixins import (
-    CreateModelMixin,
-    ListModelMixin,
-    RetrieveModelMixin,
-    UpdateModelMixin,
-)
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.filters import SearchFilter
 
 from rest_framework_simplejwt.views import TokenViewBase
 
@@ -52,50 +44,21 @@ class TokenView(TokenViewBase):
 
 
 @permission_classes([IsAuthenticated, IsAdmin])
-class UserViewSet(CreateModelMixin, ListModelMixin, GenericViewSet):
-    serializer_class = UserSerializer
-    pagination_class = PageNumberPagination
-
-    def get_queryset(self):
-        queryset = User.objects.all()
-        username = self.request.query_params.get('search', None)
-        if username is not None:
-            user_id = User.objects.get(username=username).id
-            queryset = queryset.filter(user=user_id)
-        return queryset
-
-    def perform_create(self, serializer):
-        email = self.request.query_params.get('email', None)
-        username = self.request.query_params.get('username', None)
-        serializer.save(email=email, username=username)
-
-
-@permission_classes([IsAuthenticated, IsAdmin])
 class UserModelViewSet(ModelViewSet):
+    queryset = User.objects.all()
     serializer_class = UserSerializer
     pagination_class = PageNumberPagination
     lookup_field = 'username'
+    filter_backends = [SearchFilter]
+    search_fields = ['username']
 
-    def get_queryset(self):
-        queryset = User.objects.all()
-        username = self.request.query_params.get('search', None)
-        if username is not None:
-            user_id = User.objects.get(username=username).id
-            queryset = queryset.filter(user=user_id)
-        return queryset
-
-    # def perform_create(self, serializer):
-    #     email = self.request.query_params.get('email', None)
-    #     serializer.save(email=email)
-
-    def retrieve(self, pk, username):
-        user = User.objects.get(username=username)
-        serializer = self.get_serializer(user)
-        return Response(serializer.data)
-
-    @action(methods=['get', 'patch'], detail=False,
-            permission_classes=[IsAuthenticated],
-            url_path='me', url_name='personal_data')
+    @action(
+        methods=['get', 'patch'], 
+        detail=False,
+        permission_classes=[IsAuthenticated],
+        url_path='me', 
+        url_name='personal_data',
+    )
     def personal_data(self, request):
         user = User.objects.get(username=request.user.username)
         if request.method == 'GET':
@@ -106,5 +69,7 @@ class UserModelViewSet(ModelViewSet):
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )

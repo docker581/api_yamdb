@@ -8,10 +8,16 @@ class Category(models.Model):
     name = models.CharField(max_length=50)
     slug = models.SlugField(max_length=50, unique=True)
 
+    class Meta:
+        ordering = ['name']
+
 
 class Genre(models.Model):
     name = models.CharField(max_length=50)
     slug = models.SlugField(max_length=50, unique=True)
+
+    class Meta:
+        ordering = ['name']
 
 
 class Title(models.Model):
@@ -65,6 +71,9 @@ class Review(models.Model):
         auto_now_add=True
     )
 
+    class Meta:
+        ordering = ['text']
+
 
 class Comment(models.Model):
     review_id = models.ForeignKey(
@@ -84,3 +93,6 @@ class Comment(models.Model):
     pub_date = models.DateTimeField(
         auto_now_add=True
     )
+
+    class Meta:
+        ordering = ['text']
