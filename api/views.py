@@ -17,20 +17,6 @@ from .serializers import (CategorySerializer, CommentSerializer,
 User = get_user_model()
 
 
-class CategoryViewSet(
-        ListModelMixin,
-        CreateModelMixin,
-        DestroyModelMixin,
-        viewsets.GenericViewSet):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-    permission_classes = [IsSuperuserPermissionOrReadOnly]
-    pagination_class = PageNumberPagination
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['name']
-    lookup_field = 'slug'
-
-
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleGetSerializer
@@ -60,17 +46,26 @@ class TitleViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-class GenreViewSet(
+class CommonViewSet(
         ListModelMixin,
         CreateModelMixin,
         DestroyModelMixin,
         viewsets.GenericViewSet):
+    permission_classes = [IsSuperuserPermissionOrReadOnly] 
+    filter_backends = [filters.SearchFilter]   
+    search_fields = ['name']
+    lookup_field = 'slug'    
+
+
+class CategoryViewSet(CommonViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    pagination_class = PageNumberPagination
+    
+
+class GenreViewSet(CommonViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = [IsSuperuserPermissionOrReadOnly]
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['name']
-    lookup_field = 'slug'
 
 
 class CommentViewSet(viewsets.ModelViewSet):

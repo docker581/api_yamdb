@@ -15,6 +15,7 @@ from .permissions import IsAdmin
 from .serializers import TokenSerializer, UserSerializer
 
 
+
 class EmailAPIView(APIView):
     def post(self, request):
         email = request.data.get('email')
@@ -30,7 +31,7 @@ class EmailAPIView(APIView):
         send_mail(
             f'User with email {email}',
             f'Your confirmation_code is {confirmation_code}',
-            'from@example.com',
+            EMAIL_HOST_USER,
             [email],
             fail_silently=False,
         )
@@ -62,12 +63,7 @@ class UserModelViewSet(ModelViewSet):
         if request.method == 'GET':
             serializer = UserSerializer(user)
             return Response(serializer.data)
-        request.method == 'PATCH'
         serializer = UserSerializer(user, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK) 
