@@ -117,15 +117,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
             pk=self.kwargs.get('title_id'),
         )
 
-        if Review.objects.filter(
-            author=self.request.user,
-            title_id=title.id,
-        ).exists():
-            raise serializers.ValidationError(
-                {'errors': 'you already reviewed'},
-            )
-
         serializer.save(
-                author=self.request.user,
-                title_id=title,
-            )
+            author=self.request.user,
+            title_id=title,
+        )

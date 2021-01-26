@@ -59,6 +59,22 @@ class ReviewSerializer(serializers.ModelSerializer):
         default=serializers.CurrentUserDefault(),
     )
 
+    def validate(self, data):
+        view = self.context.get('view')
+        title_id = view.kwargs.get('title_id')
+        request = self.context['request']
+        
+        if request.method == 'POST':
+            if Review.objects.filter(
+                author=request.user,
+                title_id=title_id,
+            ).exists():
+                raise serializers.ValidationError(
+                    {'errors': 'you already reviewed'},
+                )
+
+        return data
+
     class Meta:
         model = Review
         exclude = ['title_id']

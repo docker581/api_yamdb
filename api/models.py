@@ -1,3 +1,4 @@
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth import get_user_model
 from django.db import models
 
@@ -49,17 +50,6 @@ class Title(models.Model):
         verbose_name_plural = 'Произведения'
 
 
-class IntegerRangeField(models.IntegerField):
-    def __init__(self, verbose_name=None, name=None, min_value=None, max_value=None, **kwargs):
-        self.min_value, self.max_value = min_value, max_value
-        models.IntegerField.__init__(self, verbose_name, name, **kwargs)
-
-    def formfield(self, **kwargs):
-        defaults = {'min_value': self.min_value, 'max_value': self.max_value}
-        defaults.update(kwargs)
-        return super(IntegerRangeField, self).formfield(**defaults)
-
-
 class Review(models.Model):
     title_id = models.ForeignKey(
         Title,
@@ -74,7 +64,13 @@ class Review(models.Model):
         related_name='reviews',
         verbose_name='Автор отзыва'
     )
-    score = IntegerRangeField(min_value=1, max_value=10, verbose_name='Оценка')
+    score = models.PositiveSmallIntegerField(
+        validators=(
+            MinValueValidator(limit_value=1),
+            MaxValueValidator(limit_value=10)
+        ),
+        verbose_name='Оценка'
+    )
     pub_date = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата публикации'
