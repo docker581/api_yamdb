@@ -94,7 +94,9 @@ MIDDLEWARE = [
 AUTH_USER_MODEL = 'users.User'
 
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
-
+EMAIL_HOST = 'smtp.mail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'test@mail.com'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
 
 ROOT_URLCONF = 'api_yamdb.urls'
