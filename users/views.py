@@ -1,20 +1,18 @@
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-
 from rest_framework import status
-from rest_framework.decorators import permission_classes, action
+from rest_framework.decorators import action, permission_classes
+from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import (IsAuthenticated,)
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.filters import SearchFilter
-
 from rest_framework_simplejwt.views import TokenViewBase
 
-from .serializers import UserSerializer, TokenSerializer
 from .models import User
 from .permissions import IsAdmin
+from .serializers import TokenSerializer, UserSerializer
 
 
 class EmailAPIView(APIView):
@@ -53,10 +51,10 @@ class UserModelViewSet(ModelViewSet):
     search_fields = ['username']
 
     @action(
-        methods=['get', 'patch'], 
+        methods=['get', 'patch'],
         detail=False,
         permission_classes=[IsAuthenticated],
-        url_path='me', 
+        url_path='me',
         url_name='personal_data',
     )
     def personal_data(self, request):
@@ -64,12 +62,12 @@ class UserModelViewSet(ModelViewSet):
         if request.method == 'GET':
             serializer = UserSerializer(user)
             return Response(serializer.data)
-        elif request.method == 'PATCH':
-            serializer = UserSerializer(user, data=request.data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(
-                serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        request.method == 'PATCH'
+        serializer = UserSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST,
+        )
