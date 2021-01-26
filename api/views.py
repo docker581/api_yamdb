@@ -1,36 +1,27 @@
-from rest_framework import filters, viewsets, serializers
-from rest_framework.mixins import (
-    CreateModelMixin,
-    DestroyModelMixin,
-    ListModelMixin,
-)
+from django.contrib.auth import get_user_model
+from django.db.models import Avg
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, serializers, viewsets
+from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
+                                   ListModelMixin)
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from django_filters.rest_framework import DjangoFilterBackend
 
-from django.db.models import Avg
-from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
-from .models import Category, Title, Genre, Review
-from .serializers import (
-    CategorySerializer,
-    TitleSerializer,
-    GenreSerializer,
-    CommentSerializer,
-    ReviewSerializer,
-    Title2Serializer,
-)
-from .permissions import IsSuperuserPermissionOrReadOnly, IsOwnerOrReadOnly
+from .models import Category, Genre, Review, Title
+from .permissions import IsOwnerOrReadOnly, IsSuperuserPermissionOrReadOnly
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, ReviewSerializer,
+                          TitleGetSerializer, TitlePostSerializer)
 
 User = get_user_model()
 
 
 class CategoryViewSet(
-        ListModelMixin, 
-        CreateModelMixin, 
+        ListModelMixin,
+        CreateModelMixin,
         DestroyModelMixin,
-        viewsets.GenericViewSet
-    ):
+        viewsets.GenericViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsSuperuserPermissionOrReadOnly]
@@ -42,7 +33,7 @@ class CategoryViewSet(
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
-    serializer_class = TitleSerializer
+    serializer_class = TitleGetSerializer
     permission_classes = [IsSuperuserPermissionOrReadOnly]
     pagination_class = PageNumberPagination
     filter_backends = [DjangoFilterBackend]
@@ -50,8 +41,8 @@ class TitleViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
-            return TitleSerializer
-        return Title2Serializer
+            return TitleGetSerializer
+        return TitlePostSerializer
 
     def get_queryset(self):
         queryset = Title.objects.annotate(
@@ -70,11 +61,10 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 
 class GenreViewSet(
-        ListModelMixin, 
-        CreateModelMixin, 
+        ListModelMixin,
+        CreateModelMixin,
         DestroyModelMixin,
-        viewsets.GenericViewSet,
-    ):
+        viewsets.GenericViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = [IsSuperuserPermissionOrReadOnly]
