@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 
+from .managers import UserManager
+
 
 class Choices(models.TextChoices):
     USER = 'user', 'user'
@@ -17,6 +19,10 @@ class User(AbstractUser):
     )
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
+
+    # для настройки пользовательской модели
+    # без него тесты пройдет, но суперюзера не даст создать
+    objects = UserManager()
 
     role = models.TextField(
         max_length=200,

@@ -1,4 +1,5 @@
 from rest_framework import permissions
+from users.models import Choices
 
 
 class IsSuperuserPermissionOrReadOnly(permissions.BasePermission):
@@ -10,13 +11,12 @@ class IsSuperuserPermissionOrReadOnly(permissions.BasePermission):
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
-
     def has_object_permission(self, request, view, obj):
         if not request.user.is_anonymous:
             return (
                 obj.author == request.user
                 or request.user.is_superuser
-                or request.user.role == 'admin'
-                or request.user.role == 'moderator'
+                or request.user.role == Choices.ADMIN
+                or request.user.role == Choices.MODERATOR
             )
         return request.method in permissions.SAFE_METHODS
