@@ -8,6 +8,7 @@ from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
+from .filters import TitleFilter
 from .models import Category, Genre, Review, Title
 from .permissions import IsOwnerOrReadOnly, IsSuperuserPermissionOrReadOnly
 from .serializers import (CategorySerializer, CommentSerializer,
@@ -18,32 +19,19 @@ User = get_user_model()
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = Title.objects.all().annotate(
+            rating=Avg('reviews__score'),
+        ).order_by('name')
     serializer_class = TitleGetSerializer
     permission_classes = [IsSuperuserPermissionOrReadOnly]
     pagination_class = PageNumberPagination
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['genre__slug', 'category__slug', 'year']
+    filterset_class = TitleFilter
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return TitleGetSerializer
         return TitlePostSerializer
-
-    def get_queryset(self):
-        queryset = Title.objects.annotate(
-            rating=Avg('reviews__score'),
-        ).order_by('name')
-        category = self.request.query_params.get('category', None)
-        genre = self.request.query_params.get('genre', None)
-        name = self.request.query_params.get('name', None)
-        if category is not None:
-            queryset = queryset.filter(category__slug=category)
-        if genre is not None:
-            queryset = queryset.filter(genre__slug=genre)
-        if name is not None:
-            queryset = queryset.filter(name__icontains=name)
-        return queryset
 
 
 class CommonViewSet(
@@ -51,17 +39,17 @@ class CommonViewSet(
         CreateModelMixin,
         DestroyModelMixin,
         viewsets.GenericViewSet):
-    permission_classes = [IsSuperuserPermissionOrReadOnly] 
-    filter_backends = [filters.SearchFilter]   
+    permission_classes = [IsSuperuserPermissionOrReadOnly]
+    filter_backends = [filters.SearchFilter]
     search_fields = ['name']
-    lookup_field = 'slug'    
+    lookup_field = 'slug'
 
 
 class CategoryViewSet(CommonViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     pagination_class = PageNumberPagination
-    
+
 
 class GenreViewSet(CommonViewSet):
     queryset = Genre.objects.all()

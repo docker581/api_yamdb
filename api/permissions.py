@@ -1,6 +1,8 @@
 from rest_framework import permissions
 from users.models import Choices
 
+from users.models import Choices
+
 
 class IsSuperuserPermissionOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
