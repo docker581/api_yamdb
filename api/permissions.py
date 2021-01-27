@@ -1,4 +1,5 @@
 from rest_framework import permissions
+from users.models import Choices
 
 from users.models import Choices
 
@@ -12,7 +13,6 @@ class IsSuperuserPermissionOrReadOnly(permissions.BasePermission):
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
-
     def has_object_permission(self, request, view, obj):
         if not request.user.is_anonymous:
             return (
