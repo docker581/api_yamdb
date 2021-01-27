@@ -15,7 +15,6 @@ from .permissions import IsAdmin
 from .serializers import TokenSerializer, UserSerializer
 
 
-
 class EmailAPIView(APIView):
     def post(self, request):
         email = request.data.get('email')
