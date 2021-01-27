@@ -20,8 +20,9 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
-    # для настройки пользовательской модели
-    # без него тесты пройдет, но суперюзера не даст создать
+    # по документации (https://docs.djangoproject.com/en/3.1/topics/auth/
+    # customizing/#writing-a-manager-for-a-custom-user-model)
+    # без менеджера тесты пройдет, но суперюзера не даст создать
     objects = UserManager()
 
     role = models.TextField(

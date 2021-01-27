@@ -2,12 +2,12 @@ from django.contrib.auth.base_user import BaseUserManager
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, username, password=None):
+    def create_user(self, email, password=None, username=None):
         if email is None:
             raise TypeError('Users must have an email address.')
         user = self.model(email=self.normalize_email(email))
-        user.username = username
         user.set_password(password)
+        user.username = username
         user.save()
         return user
 
@@ -20,4 +20,3 @@ class UserManager(BaseUserManager):
         user.role = 'admin'
         user.save()
         return user
-        
